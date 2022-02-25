@@ -19,14 +19,15 @@ class FirstChallenge
 
         void run();
         void turn();
+        void stop();
         void show_odom();
-        void shoe_scan();
+        void show_scan();
 
         int hz_;
 
         nav_msgs::Odometry odometry_;
         sensor_msgs::LaserScan laser_;
-        roomba_500driver_meiji::RoombaCtrl cmd_ver_;
+        roomba_500driver_meiji::RoombaCtrl cmd_vel_;
 
         ros::NodeHandle nh_;
         ros::NodeHandle private_nh_;

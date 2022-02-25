@@ -18,7 +18,13 @@ void FirstChallenge::laser_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
     laser_ = *msg;
 }
 
-void FirstChallenge::run();
+void GetRPY(const geometry_msgs::Quaternion &q, double &roll, double &pitch, double &yaw)
+{
+    tf::Quaternion quat(q.x, q.y, q.z, q.w);
+    tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);
+}
+
+void FirstChallenge::run()
 {
     cmd_vel_.mode = 11;
     cmd_vel_.cntl.linear.x = 0.1;
@@ -27,11 +33,20 @@ void FirstChallenge::run();
     pub_cmd_vel_.publish(cmd_vel_);
 }
 
-void FirstChallenge::turn();
+void FirstChallenge::turn()
 {
     cmd_vel_.mode = 11;
     cmd_vel_.cntl.linear.x = 0.0;
-    cmd_vel_.cntl.angular.z = M_PI/50;
+    cmd_vel_.cntl.angular.z = M_PI/4;
+
+    pub_cmd_vel_.publish(cmd_vel_);
+}
+
+void FirstChallenge::stop()
+{
+    cmd_vel_.mode = 11;
+    cmd_vel_.cntl.linear.x = 0.0;
+    cmd_vel_.cntl.angular.z = 0.0;
 
     pub_cmd_vel_.publish(cmd_vel_);
 }
@@ -41,7 +56,7 @@ void FirstChallenge::show_odom()
     std::cout << "odom" << ": x:" << odometry_.pose.pose.position.x << " y:" << odometry_.pose.pose.position.y << " z:" << odometry_.pose.pose.position.z << std::endl;
 }
 
-void FirstChallenge::show_scan
+void FirstChallenge::show_scan()
 {
     float range_min = 1e6;
     for(int i=0; i<laser_.ranges.size(); i++) {
@@ -55,27 +70,29 @@ void FirstChallenge::show_scan
 void FirstChallenge::process()
 {
     ros::Rate loop_late(hz_);
-    int count = 0;
-
     while(ros::ok())
     {
-        run();
-        show_odom();
-//        show_scan();
+        if(odometry_.pose.pose.position.x <= 1.0) {
+            run();
+            show_odom();
+//          show_scan();
 
-        ros::spinOnce();
-        loop_late.sleep();
-        count += 1;
+            ros::spinOnce();
+            loop_late.sleep();
+        } else if(odometry_.pose.pose.position.x > 1.0) {
+            turn();
+            show_odom();
 
-        if(count > 50) {
-            for(int i=0; i<50; i++) {
-                turn();
+            ros::spinOnce();
+            loop_late.sleep();
 
-                ros::spinOnce();
-                loop_late.sleep();
-            }
-            break;
-        }
+           /* stop();
+            show_odom();
+
+            ros::spinOnce();
+            loop_late.sleep();
+    */    }
+       // count += 1;
     }
 }
 
