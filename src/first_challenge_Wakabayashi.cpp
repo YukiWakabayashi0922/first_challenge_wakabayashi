@@ -18,10 +18,13 @@ void FirstChallenge::laser_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
     laser_ = *msg;
 }
 
-void GetRPY(const geometry_msgs::Quaternion &q, double &roll, double &pitch, double &yaw)
+float FirstChallenge::Getyaw()
 {
-    tf::Quaternion quat(q.x, q.y, q.z, q.w);
+    double roll, pitch, yaw;
+    tf::Quaternion quat(odometry_.pose.pose.orientation.x, odometry_.pose.pose.orientation.y, odometry_.pose.pose.orientation.z, odometry_.pose.pose.orientation.w);
     tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);
+
+    return float(yaw);
 }
 
 void FirstChallenge::run()
@@ -86,12 +89,21 @@ void FirstChallenge::process()
             ros::spinOnce();
             loop_late.sleep();
 
+            if(Getyaw() == 0.0) {
+                stop();
+                show_odom();
+
+                ros::spinOnce();
+                loop_late.sleep();
+            }
+        }
+
            /* stop();
             show_odom();
 
             ros::spinOnce();
             loop_late.sleep();
-    */    }
+    */
        // count += 1;
     }
 }
