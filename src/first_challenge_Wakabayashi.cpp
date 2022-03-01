@@ -54,7 +54,7 @@ void FirstChallenge::turn()
 {
     cmd_vel_.mode = 11;
     cmd_vel_.cntl.linear.x = 0.0;
-    cmd_vel_.cntl.angular.z = M_PI/6;
+    cmd_vel_.cntl.angular.z = M_PI/8;
 
     pub_cmd_vel_.publish(cmd_vel_);
 }
@@ -108,7 +108,7 @@ void FirstChallenge::process()
                 loop_late.sleep();
                 count += 1;
 
-                if((Getyaw() < 0.1) && (Getyaw() > -0.1) && (count > 10)) {
+                if((Getyaw() < 0.05) && (Getyaw() > -0.05) && (count > 50)) {
                     stage = 3;
                 }
                 break;
