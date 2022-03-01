@@ -59,6 +59,11 @@ void FirstChallenge::show_odom()
     std::cout << "odom" << ": x:" << odometry_.pose.pose.position.x << " y:" << odometry_.pose.pose.position.y << " z:" << odometry_.pose.pose.position.z << std::endl;
 }
 
+void FirstChallenge::show_yaw()
+{
+    std::cout << ": yaw:" << Getyaw() << std::endl;
+}
+
 void FirstChallenge::show_scan()
 {
     float range_min = 1e6;
@@ -85,6 +90,7 @@ void FirstChallenge::process()
         } else if(odometry_.pose.pose.position.x > 1.0) {
             turn();
             show_odom();
+            show_yaw();
 
             ros::spinOnce();
             loop_late.sleep();
@@ -92,6 +98,7 @@ void FirstChallenge::process()
             if(Getyaw() == 0.0) {
                 stop();
                 show_odom();
+                show_yaw();
 
                 ros::spinOnce();
                 loop_late.sleep();

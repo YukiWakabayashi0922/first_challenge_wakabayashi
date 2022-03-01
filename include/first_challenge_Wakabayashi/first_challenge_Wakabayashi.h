@@ -22,6 +22,7 @@ class FirstChallenge
         void turn();
         void stop();
         void show_odom();
+        void show_yaw();
         void show_scan();
 
         int hz_;
