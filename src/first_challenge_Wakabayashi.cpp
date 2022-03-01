@@ -27,6 +27,20 @@ float FirstChallenge::Getyaw()
     return float(yaw);
 }
 
+float FirstChallenge::Getrange_min()
+{
+    float range_min = 1e6;
+    int size_medium = laser_.ranges.size()/2;
+    int size_min = size_medium - 20;
+    int size_max = size_medium + 20;
+    for(int i=size_min; i<size_max; i++) {
+        if(laser_.ranges[i] < range_min) {
+            range_min = laser_.ranges[i];
+        }
+    }
+    return float(range_min);
+}
+
 void FirstChallenge::run()
 {
     cmd_vel_.mode = 11;
@@ -40,7 +54,7 @@ void FirstChallenge::turn()
 {
     cmd_vel_.mode = 11;
     cmd_vel_.cntl.linear.x = 0.0;
-    cmd_vel_.cntl.angular.z = M_PI/4;
+    cmd_vel_.cntl.angular.z = M_PI/6;
 
     pub_cmd_vel_.publish(cmd_vel_);
 }
@@ -61,57 +75,60 @@ void FirstChallenge::show_odom()
 
 void FirstChallenge::show_yaw()
 {
-    std::cout << ": yaw:" << Getyaw() << std::endl;
+    std::cout << "yaw:" << Getyaw() << std::endl;
 }
 
 void FirstChallenge::show_scan()
 {
-    float range_min = 1e6;
-    for(int i=0; i<laser_.ranges.size(); i++) {
-        if(laser_.ranges[i] < range_min) {
-            range_min = laser_.ranges[i];
-        }
-    }
-    std::cout << "scan: min:" << range_min << std::endl;
+    std::cout << "scan: min:" << Getrange_min() << std::endl;
 }
 
 void FirstChallenge::process()
 {
+    int count = 0;
+    int stage = 1;
     ros::Rate loop_late(hz_);
     while(ros::ok())
     {
-        if(odometry_.pose.pose.position.x <= 1.0) {
-            run();
-            show_odom();
-//          show_scan();
-
-            ros::spinOnce();
-            loop_late.sleep();
-        } else if(odometry_.pose.pose.position.x > 1.0) {
-            turn();
-            show_odom();
-            show_yaw();
-
-            ros::spinOnce();
-            loop_late.sleep();
-
-            if(Getyaw() == 0.0) {
-                stop();
+        switch(stage) {
+            case 1:
+                run();
                 show_odom();
-                show_yaw();
-
                 ros::spinOnce();
                 loop_late.sleep();
-            }
+
+                if(odometry_.pose.pose.position.x >= 1.0) {
+                    stage = 2;
+                }
+                break;
+            case 2:
+                turn();
+                show_yaw();
+                ros::spinOnce();
+                loop_late.sleep();
+                count += 1;
+
+                if((Getyaw() < 0.1) && (Getyaw() > -0.1) && (count > 10)) {
+                    stage = 3;
+                }
+                break;
+            case 3:
+                run();
+                show_scan();
+                ros::spinOnce();
+                loop_late.sleep();
+
+                if(Getrange_min() <= 0.52) {
+                    stage = 4;
+                }
+                break;
+            case 4:
+                stop();
+                show_scan();
+                ros::spinOnce();
+                loop_late.sleep();
+                break;
         }
-
-           /* stop();
-            show_odom();
-
-            ros::spinOnce();
-            loop_late.sleep();
-    */
-       // count += 1;
     }
 }
 

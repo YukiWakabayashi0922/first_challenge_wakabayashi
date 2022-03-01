@@ -1,5 +1,5 @@
-#ifndef FIRST_CHALLENGE_H
-#define FIRST_CHALLENGE_H
+#ifndef FIRST_CHALLENGE_WAKABAYASHI_H
+#define FIRST_CHALLENGE_WAKABAYASHI_H
 
 #include <ros/ros.h>
 #include "roomba_500driver_meiji/RoombaCtrl.h"
@@ -17,6 +17,7 @@ class FirstChallenge
         void odometry_callback(const nav_msgs::Odometry::ConstPtr&);
         void laser_callback(const sensor_msgs::LaserScan::ConstPtr&);
         float Getyaw();
+        float Getrange_min();
 
         void run();
         void turn();
