@@ -44,7 +44,7 @@ float FirstChallenge::Getrange_min()
 void FirstChallenge::run()
 {
     cmd_vel_.mode = 11;
-    cmd_vel_.cntl.linear.x = 0.1;
+    cmd_vel_.cntl.linear.x = 0.2;
     cmd_vel_.cntl.angular.z = 0.0;
 
     pub_cmd_vel_.publish(cmd_vel_);
@@ -108,7 +108,7 @@ void FirstChallenge::process()
                 loop_late.sleep();
                 count += 1;
 
-                if((Getyaw() < 0.05) && (Getyaw() > -0.05) && (count > 50)) {
+                if((Getyaw() < 0.03) && (Getyaw() > -0.03) && (count > 50)) {
                     stage = 3;
                 }
                 break;
@@ -118,7 +118,7 @@ void FirstChallenge::process()
                 ros::spinOnce();
                 loop_late.sleep();
 
-                if(Getrange_min() <= 0.52) {
+                if(Getrange_min() <= 0.55) {
                     stage = 4;
                 }
                 break;
