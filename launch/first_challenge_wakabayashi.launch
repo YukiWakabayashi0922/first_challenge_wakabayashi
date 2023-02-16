@@ -1,6 +1,6 @@
 <?xml version = "1.0"?>
 <launch>
-    <node pkg = "first_challenge_Wakabayashi" name = "first_challenge_Wakabayashi" type = "first_challenge_Wakabayashi" output = "screen"/>
+    <node pkg = "first_challenge_wakabayashi" name = "first_challenge_wakabayashi" type = "first_challenge_wakabayashi" output = "screen"/>
     <node pkg = "roomba_500driver_meiji" name = "roomba_500driver_meiji" type = "main500"/>
     <node pkg = "urg_node" name = "urg_node" type = "urg_node" args = "_ip_address:=192.168.1.113"/>
 </launch>

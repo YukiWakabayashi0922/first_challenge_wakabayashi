@@ -1,4 +1,4 @@
-#include "first_challenge_Wakabayashi/first_challenge_Wakabayashi.h"
+#include "first_challenge_wakabayashi/first_challenge_wakabayashi.h"
 
 FirstChallenge::FirstChallenge():private_nh_("~")
 {
@@ -134,7 +134,7 @@ void FirstChallenge::process()
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "first_challenge_Wakabayashi");
+    ros::init(argc, argv, "first_challenge_wakabayashi");
     FirstChallenge first_challenge;
     first_challenge.process();
     ros::spin();
