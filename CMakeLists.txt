@@ -12,6 +12,7 @@ find_package(catkin REQUIRED
   roomba_500driver_meiji
   nav_msgs
   sensor_msgs
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
