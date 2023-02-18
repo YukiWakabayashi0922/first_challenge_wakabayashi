@@ -34,9 +34,9 @@ class FirstChallenge
 
         ros::NodeHandle nh_;
         ros::NodeHandle private_nh_;
-        ros::Subscriber sub_odom_;
-        ros::Subscriber sub_laser_;
-        ros::Publisher pub_cmd_vel_;
+        ros::Subscriber odom_sub_;
+        ros::Subscriber laser_sub_;
+        ros::Publisher cmd_vel_pub_;
 
 };
 

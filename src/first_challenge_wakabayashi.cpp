@@ -3,9 +3,9 @@
 FirstChallenge::FirstChallenge():private_nh_("~")
 {
     private_nh_.param("hz", hz_, {10});
-    sub_odom_ = nh_.subscribe("/roomba/odometry", 100, &FirstChallenge::odometry_callback, this);
-    sub_laser_ = nh_.subscribe("/scan", 100, &FirstChallenge::laser_callback, this);
-    pub_cmd_vel_ = nh_.advertise<roomba_500driver_meiji::RoombaCtrl>("/roomba/control", 1);
+    odom_sub_ = nh_.subscribe("/roomba/odometry", 1, &FirstChallenge::odometry_callback, this);
+    laser_sub_ = nh_.subscribe("/scan", 1, &FirstChallenge::laser_callback, this);
+    cmd_vel_pub_ = nh_.advertise<roomba_500driver_meiji::RoombaCtrl>("/roomba/control", 1);
 }
 
 void FirstChallenge::odometry_callback(const nav_msgs::Odometry::ConstPtr& msg)
@@ -47,7 +47,7 @@ void FirstChallenge::run()
     cmd_vel_.cntl.linear.x = 0.2;
     cmd_vel_.cntl.angular.z = 0.0;
 
-    pub_cmd_vel_.publish(cmd_vel_);
+    cmd_vel_pub_.publish(cmd_vel_);
 }
 
 void FirstChallenge::turn()
@@ -56,7 +56,7 @@ void FirstChallenge::turn()
     cmd_vel_.cntl.linear.x = 0.0;
     cmd_vel_.cntl.angular.z = M_PI/8;
 
-    pub_cmd_vel_.publish(cmd_vel_);
+    cmd_vel_pub_.publish(cmd_vel_);
 }
 
 void FirstChallenge::stop()
@@ -65,7 +65,7 @@ void FirstChallenge::stop()
     cmd_vel_.cntl.linear.x = 0.0;
     cmd_vel_.cntl.angular.z = 0.0;
 
-    pub_cmd_vel_.publish(cmd_vel_);
+    cmd_vel_pub_.publish(cmd_vel_);
 }
 
 void FirstChallenge::show_odom()
@@ -87,7 +87,7 @@ void FirstChallenge::process()
 {
     int count = 0;
     int stage = 1;
-    ros::Rate loop_late(hz_);
+    ros::Rate loop_rate(hz_);
     while(ros::ok())
     {
         switch(stage) {
@@ -95,7 +95,7 @@ void FirstChallenge::process()
                 run();
                 show_odom();
                 ros::spinOnce();
-                loop_late.sleep();
+                loop_rate.sleep();
 
                 if(odometry_.pose.pose.position.x >= 1.0) {
                     stage = 2;
@@ -105,7 +105,7 @@ void FirstChallenge::process()
                 turn();
                 show_yaw();
                 ros::spinOnce();
-                loop_late.sleep();
+                loop_rate.sleep();
                 count += 1;
 
                 if((Getyaw() < 0.03) && (Getyaw() > -0.03) && (count > 50)) {
@@ -116,7 +116,7 @@ void FirstChallenge::process()
                 run();
                 show_scan();
                 ros::spinOnce();
-                loop_late.sleep();
+                loop_rate.sleep();
 
                 if(Getrange_min() <= 0.55) {
                     stage = 4;
@@ -126,7 +126,7 @@ void FirstChallenge::process()
                 stop();
                 show_scan();
                 ros::spinOnce();
-                loop_late.sleep();
+                loop_rate.sleep();
                 break;
         }
     }
@@ -137,6 +137,5 @@ int main(int argc, char** argv)
     ros::init(argc, argv, "first_challenge_wakabayashi");
     FirstChallenge first_challenge;
     first_challenge.process();
-    ros::spin();
     return 0;
 }
